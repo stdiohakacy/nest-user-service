@@ -2,7 +2,7 @@ import 'tsconfig-paths/register';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { join } from 'path';
 
-export const pomTypeormConfig: DataSourceOptions = {
+export const TypeormConfig: DataSourceOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -24,4 +24,4 @@ export const pomTypeormConfig: DataSourceOptions = {
   },
 };
 
-export default new DataSource({ ...pomTypeormConfig, synchronize: false });
+export default new DataSource({ ...TypeormConfig, synchronize: false });

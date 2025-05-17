@@ -17,7 +17,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:run": "npm run typeorm migration:run -- -d src/modules/user/infrastructure/persistence/typeorm/typeorm.config.ts",
+    "migration:generate": "npm run typeorm -- -d src/modules/user/infrastructure/persistence/typeorm/typeorm.config.ts migration:generate src/modules/user/infrastructure/persistence/typeorm/migrations/$npm_config_name",
+    "migration:create": "npm run typeorm -- migration:create src/modules/user/infrastructure/persistence/typeorm/migrations/$npm_config_name",
+    "migration:revert": "npm run typeorm -- -d src/modules/user/infrastructure/persistence/typeorm/typeorm.config.ts migration:revert",
+    "migration:drop": "npm run typeorm -- -d src/modules/user/infrastructure/persistence/typeorm/typeorm.config.ts schema:drop"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -27,6 +33,9 @@
     "@nestjs/typeorm": "^11.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "nanoid": "^5.1.5",
+    "nestjs-request-context": "^4.0.0",
+    "pg": "^8.16.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.24"
