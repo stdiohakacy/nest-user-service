@@ -1,4 +1,4 @@
-import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
+import { BaseUniqueEntityId } from '../../domain/identifier/base.unique-entity.id';
 
 /*  Most of repositories will probably need generic 
     save/find/delete operations, so it's easier
