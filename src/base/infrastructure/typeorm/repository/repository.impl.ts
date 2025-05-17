@@ -3,8 +3,13 @@ import { BaseUniqueEntityId } from '../../../domain/identifier/base.unique-entit
 import { BASE_SCHEMA } from '../schema/base.schema';
 import { BaseEntity as BaseInfrastructureEntity } from '../schema/base.entity';
 import { BaseEntity as BaseDomainEntity } from '../../../domain/entities/base.entity';
-import { RepositoryPort } from 'src/base/application/ports/repository.port';
+import {
+  Paginated,
+  PaginatedQueryParams,
+  RepositoryPort,
+} from 'src/base/application/ports/repository.port';
 import { MapperInterface } from '@base/domain/mappers/mapper.interface';
+import { None, Option, Some } from 'oxide.ts';
 
 export abstract class BaseRepositoryImpl<
   EDomain extends BaseDomainEntity<any>,
@@ -14,8 +19,61 @@ export abstract class BaseRepositoryImpl<
   constructor(
     private readonly repository: Repository<EOrm>,
     private readonly schema: { TABLE_NAME: string } & typeof BASE_SCHEMA,
-    private readonly mapper: MapperInterface<EDomain, EOrm>,
+    protected readonly mapper: MapperInterface<EDomain, EOrm>,
   ) {}
+
+  async findOneById(id: BaseUniqueEntityId): Promise<Option<EDomain>> {
+    try {
+      const query = this.repository.createQueryBuilder(this.schema.TABLE_NAME);
+      const entity = await query
+        .where(`${this.schema.TABLE_NAME}.id = :id`, { id: id.toString() })
+        .getOne();
+
+      if (!entity) {
+        return None;
+      }
+
+      return Some(this.mapper.toDomain(entity));
+    } catch (error) {}
+  }
+
+  async findAll(): Promise<EDomain[]> {
+    try {
+      const query = await this.repository.createQueryBuilder(
+        this.schema.TABLE_NAME,
+      );
+      const entities = query.getMany();
+
+      return entities.then((entities) =>
+        entities.map((entity) => this.mapper.toDomain(entity)),
+      );
+    } catch (error) {}
+  }
+
+  async findAllPaginated(
+    params: PaginatedQueryParams,
+  ): Promise<Paginated<EDomain>> {
+    try {
+      const query = this.repository.createQueryBuilder(this.schema.TABLE_NAME);
+      const [entities, count] = await query
+        .skip(params.offset)
+        .take(params.limit)
+        .orderBy(
+          `${this.schema.TABLE_NAME}.${params.orderBy.field}`,
+          params.orderBy.param,
+        )
+        .getManyAndCount();
+
+      return Promise.resolve(
+        new Paginated<EDomain>({
+          count,
+          limit: params.limit,
+          page: params.page,
+          data: entities.map((entity) => this.mapper.toDomain(entity)),
+        }),
+      );
+    } catch (error) {}
+  }
 
   async save(aggregate: EDomain): Promise<void> {
     try {

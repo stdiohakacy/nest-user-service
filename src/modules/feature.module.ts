@@ -3,6 +3,5 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [UserModule],
-  providers: [],
 })
 export class FeatureModule {}

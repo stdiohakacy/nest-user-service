@@ -7,6 +7,7 @@ import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
 import { UserRepositoryPort } from 'src/modules/user/application/ports/user.repository.port';
 import { UserMapper } from '../mappers/user.mapper';
 import { Injectable } from '@nestjs/common';
+import { None, Option, Some } from 'oxide.ts';
 
 @Injectable()
 export class UserRepositoryImpl
@@ -20,7 +21,21 @@ export class UserRepositoryImpl
     super(userRepository, USER_SCHEMA, new UserMapper());
   }
 
-  async findOneByEmail(email: string): Promise<UserEntityOrm | null> {
-    return await this.userRepository.findOne({ where: { email } });
+  async findOneByEmail(email: string): Promise<Option<UserEntity>> {
+    try {
+      const userOrm = await this.userRepository.findOne({
+        where: { email },
+      });
+
+      if (!userOrm) {
+        return None;
+      }
+
+      const user = this.mapper.toDomain(userOrm);
+
+      return Some(user);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

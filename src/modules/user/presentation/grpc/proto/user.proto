@@ -4,7 +4,7 @@ package user;
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+  rpc FindUserByEmail(FindUserByEmailRequest) returns (FindUserByEmailResponse);
 }
 
 message CreateUserRequest {
@@ -17,11 +17,11 @@ message CreateUserResponse {
   string id = 1;
 }
 
-message GetUserByIdRequest {
-  string id = 1;
+message FindUserByEmailRequest {
+  string email = 1;
 }
 
-message GetUserByIdResponse {
+message FindUserByEmailResponse {
   string id = 1;
   string name = 2;
   string email = 3;

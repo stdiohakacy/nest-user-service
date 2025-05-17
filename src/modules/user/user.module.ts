@@ -3,6 +3,5 @@ import { PresentationModule } from './presentation/presentation.module';
 
 @Module({
   imports: [PresentationModule],
-  providers: [],
 })
 export class UserModule {}
