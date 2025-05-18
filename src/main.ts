@@ -3,8 +3,12 @@ import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { ReflectionService } from '@grpc/reflection';
-import { NestApplicationOptions } from '@nestjs/common';
+import { Logger, NestApplicationOptions, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import compression from 'compression';
+import { useContainer, validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { AppEnvDto } from './app/dtos/app.env.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -16,6 +20,47 @@ async function bootstrap() {
 
   const grpcHost: string = configService.get<string>('app.grpc.host');
   const grpcPort: number = configService.get<number>('app.grpc.port');
+  const env: string = configService.get<string>('app.env');
+  const timezone: string = configService.get<string>('app.timezone');
+  const globalPrefix: string = configService.get<string>('app.globalPrefix');
+  const versioningPrefix: string = configService.get<string>(
+    'app.urlVersion.prefix',
+  );
+  const version: string = configService.get<string>('app.urlVersion.version');
+  const versionEnable: string = configService.get<string>(
+    'app.urlVersion.enable',
+  );
+
+  const logger = new Logger('Nest-User-Srv-Main');
+  process.env.NODE_ENV = env;
+  process.env.TZ = timezone;
+
+  // Compression
+  app.use(compression());
+
+  // Global
+  app.setGlobalPrefix(globalPrefix);
+
+  // For Custom Validation
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+  // Versioning
+  if (versionEnable) {
+    app.enableVersioning({
+      type: VersioningType.URI,
+      defaultVersion: version,
+      prefix: versioningPrefix,
+    });
+  }
+
+  // Validate Env
+  const classEnv = plainToInstance(AppEnvDto, process.env);
+
+  const errors = await validate(classEnv);
+  if (errors.length > 0) {
+    logger.error(errors);
+    throw new Error('Env Variable Invalid');
+  }
 
   const grpcApp = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -38,7 +83,6 @@ async function bootstrap() {
   grpcApp.listen();
   console.log('gRPC Server started on port 6000');
 
-  await app.listen(3000);
-  console.log('App started on port 3000');
+  return;
 }
 bootstrap();
