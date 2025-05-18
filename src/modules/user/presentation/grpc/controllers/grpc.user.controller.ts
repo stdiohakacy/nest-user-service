@@ -1,18 +1,19 @@
 import { status } from '@grpc/grpc-js';
-import { Controller, NotFoundException } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { match, Result } from 'oxide.ts';
 import { FindUserByEmailQuery } from 'src/modules/user/application/queries/find-user-by-email/find-user-by-email.query';
 import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
 import { UserNotFoundError } from 'src/modules/user/domain/errors/user.errors';
+import { FindUserByEmailGrpcRequestDto } from '../dtos/request/find-user-by-email.grpc-request.dto';
 
 @Controller()
 export class GrpcUserController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @GrpcMethod('UserService', 'FindUserByEmail')
-  async findUserByEmail(dto: any) {
+  async findUserByEmail(dto: FindUserByEmailGrpcRequestDto) {
     const result: Result<UserEntity, Error> = await this.queryBus.execute(
       new FindUserByEmailQuery(dto),
     );

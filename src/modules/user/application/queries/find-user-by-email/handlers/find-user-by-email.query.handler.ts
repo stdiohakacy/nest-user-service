@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Err, Ok, Result } from 'oxide.ts';
+import { Err, Ok, Option, Result } from 'oxide.ts';
 import { FindUserByEmailQuery } from '../find-user-by-email.query';
 import { UserRepositoryPort } from '../../../ports/user.repository.port';
 import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
@@ -22,7 +22,8 @@ export class FindUserByEmailQueryHandler
     try {
       const { email } = query.dto;
 
-      const user = await this.userRepository.findOneByEmail(email);
+      const user: Option<UserEntity> =
+        await this.userRepository.findOneByEmail(email);
 
       if (user.isNone()) {
         return Err(new UserNotFoundError(email));

@@ -29,6 +29,5 @@ export class UserEntity extends BaseAggregateRoot<UserProps> {
 
   public validate(): void {
     // entity business rules validation to protect it's invariant before saving entity to a database
-    throw new Error('Method not implemented.');
   }
 }

@@ -8,7 +8,7 @@ export const TypeormConfig: DataSourceOptions = {
   port: 5432,
   username: 'postgres',
   password: 'postgres',
-  database: 'cornal_pom_db',
+  database: 'nest-user-db',
   entities: [join(__dirname, 'entities', '*.entity-orm.{ts,js}')],
   migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
   migrationsTableName: 'migrations',

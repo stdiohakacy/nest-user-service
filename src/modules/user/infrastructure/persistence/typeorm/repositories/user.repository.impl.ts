@@ -31,7 +31,7 @@ export class UserRepositoryImpl
         return None;
       }
 
-      const user = this.mapper.toDomain(userOrm);
+      const user: UserEntity = this.mapper.toDomain(userOrm);
 
       return Some(user);
     } catch (error) {
