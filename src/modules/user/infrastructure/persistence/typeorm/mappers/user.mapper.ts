@@ -3,9 +3,18 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
 import { UserEntityOrm } from '../entities/user.entity-orm';
 import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
+import { UserResponseDto } from '@base/presentation/grpc/response/user.response.dto';
 
+/**
+ * Mapper constructs objects that are used in different layers:
+ * Record is an object that is stored in a database,
+ * Entity is an object that is used in application domain layer,
+ * and a ResponseDTO is an object returned to a user (usually as json).
+ */
 @Injectable()
-export class UserMapper implements MapperInterface<UserEntity, UserEntityOrm> {
+export class UserMapper
+  implements MapperInterface<UserEntity, UserEntityOrm, UserResponseDto>
+{
   toPersistence(entity: UserEntity): UserEntityOrm {
     const props = entity.getProps();
 
@@ -37,4 +46,22 @@ export class UserMapper implements MapperInterface<UserEntity, UserEntityOrm> {
 
     return entity;
   }
+
+  toResponse(entity: UserEntity): UserResponseDto {
+    const props = entity.getProps();
+
+    const response = new UserResponseDto(entity);
+    response.email = props.email;
+    response.name = props.name;
+
+    return response;
+  }
+
+  /* ^ Data returned to the user is whitelisted to avoid leaks.
+     If a new property is added, like password or a
+     credit card number, it won't be returned
+     unless you specifically allow this.
+     (avoid blacklisting, which will return everything
+      but blacklisted items, which can lead to a data leak).
+  */
 }

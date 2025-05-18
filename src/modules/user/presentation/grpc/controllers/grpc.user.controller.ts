@@ -7,13 +7,20 @@ import { FindUserByEmailQuery } from 'src/modules/user/application/queries/find-
 import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
 import { UserNotFoundError } from 'src/modules/user/domain/errors/user.errors';
 import { FindUserByEmailGrpcRequestDto } from '../dtos/request/find-user-by-email.grpc-request.dto';
+import { UserResponseDto } from '@base/presentation/grpc/response/user.response.dto';
+import { UserMapper } from 'src/modules/user/infrastructure/persistence/typeorm/mappers/user.mapper';
 
 @Controller()
 export class GrpcUserController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly userMapper: UserMapper,
+  ) {}
 
   @GrpcMethod('UserService', 'FindUserByEmail')
-  async findUserByEmail(dto: FindUserByEmailGrpcRequestDto) {
+  async findUserByEmail(
+    dto: FindUserByEmailGrpcRequestDto,
+  ): Promise<UserResponseDto> {
     const result: Result<UserEntity, Error> = await this.queryBus.execute(
       new FindUserByEmailQuery(dto),
     );
@@ -21,7 +28,7 @@ export class GrpcUserController {
     // if Ok we return a response with an id
     // if Error decide what to do with it depending on its type
     return match(result, {
-      Ok: (user: UserEntity) => user,
+      Ok: (user: UserEntity) => this.userMapper.toResponse(user),
       Err: (error: Error) => {
         if (error instanceof UserNotFoundError) {
           throw new RpcException({
@@ -29,7 +36,6 @@ export class GrpcUserController {
             message: error.message,
           });
         }
-
         throw new RpcException({
           code: status.INTERNAL,
           message: error.message,
