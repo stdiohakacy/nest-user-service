@@ -37,7 +37,9 @@ export type PaginatedQueryParams = {
  */
 export interface RepositoryPort<TEntity> {
   findOneById(id: BaseUniqueEntityId): Promise<Option<TEntity>>;
+
   findAll(): Promise<TEntity[]>;
+
   findAllPaginated(params: PaginatedQueryParams): Promise<Paginated<TEntity>>;
   /**
    * Save an entity (create or update)
