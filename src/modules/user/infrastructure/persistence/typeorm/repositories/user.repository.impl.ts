@@ -1,13 +1,13 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntityOrm } from '../entities/user.entity-orm';
 import { Repository } from 'typeorm';
-import { USER_SCHEMA } from '../schemas/user.schema';
 import { BaseRepositoryImpl } from '@base/infrastructure/typeorm/repository/repository.impl';
-import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
-import { UserRepositoryPort } from 'src/modules/user/application/ports/user.repository.port';
-import { UserMapper } from '../mappers/user.mapper';
+import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
+import { UserRepositoryPort } from '@module/user/application/ports/user.repository.port';
 import { Injectable } from '@nestjs/common';
 import { None, Option, Some } from 'oxide.ts';
+import { UserMapper } from '../mappers/user.mapper';
+import { USER_SCHEMA } from '../schemas/user.schema';
+import { UserEntityOrm } from '../entities/user.entity-orm';
 
 @Injectable()
 export class UserRepositoryImpl

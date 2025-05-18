@@ -1,6 +1,6 @@
 import { MapperInterface } from '@base/domain/mappers/mapper.interface';
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from 'src/modules/user/domain/aggregates/user.aggregate';
+import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
 import { UserEntityOrm } from '../entities/user.entity-orm';
 import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
 import { UserResponseDto } from '@base/presentation/grpc/response/user.response.dto';
