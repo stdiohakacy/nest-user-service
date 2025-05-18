@@ -3,6 +3,7 @@ import { FeatureModule } from '../modules/feature.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule } from '@nestjs/config';
 import configs from '../configs';
+import { RequestModule } from './request/request.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import configs from '../configs';
       expandVariables: false,
     }),
     CqrsModule.forRoot(),
+    RequestModule,
     FeatureModule,
   ],
   providers: [],
