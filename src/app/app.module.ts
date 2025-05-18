@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FeatureModule } from './modules/feature.module';
+import { FeatureModule } from '../modules/feature.module';
 import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({

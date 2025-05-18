@@ -1,11 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { ReflectionService } from '@grpc/reflection';
+import { NestApplicationOptions } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    abortOnError: true,
+    bufferLogs: false,
+  } as NestApplicationOptions);
+
   await app.listen(3000);
 
   const grpcApp = await NestFactory.createMicroservice<MicroserviceOptions>(
