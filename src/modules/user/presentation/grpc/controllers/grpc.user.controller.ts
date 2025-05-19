@@ -1,7 +1,6 @@
-import { status } from '@grpc/grpc-js';
 import { Controller } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { GrpcMethod } from '@nestjs/microservices';
 import { match, Result } from 'oxide.ts';
 import { FindUserByEmailQuery } from '@module/user/application/queries/find-user-by-email/find-user-by-email.query';
 import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
@@ -16,6 +15,7 @@ import { CreateUserGrpcRequestDto } from '../dtos/request/create-user.grpc-reque
 import { IdResponseDto } from '@base/presentation/grpc/response/id.response.dto';
 import { CreateUserCommand } from '@module/user/application/commands/create-user/create-user.command';
 import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
+import { DomainToGrpcErrorMapper } from '../mappers/domain-to-grpc-error.mapper';
 
 @Controller()
 export class GrpcUserController {
@@ -29,25 +29,15 @@ export class GrpcUserController {
   async findUserByEmail(
     dto: FindUserByEmailGrpcRequestDto,
   ): Promise<UserResponseDto> {
-    const result: Result<UserEntity, Error> = await this.queryBus.execute(
-      new FindUserByEmailQuery(dto),
-    );
+    const result: Result<UserEntity, UserNotFoundError> =
+      await this.queryBus.execute(new FindUserByEmailQuery(dto));
     // Deciding what to do with a Result (similar to Rust matching)
     // if Ok we return a response with an id
     // if Error decide what to do with it depending on its type
     return match(result, {
       Ok: (user: UserEntity) => this.userMapper.toResponse(user),
       Err: (error: Error) => {
-        if (error instanceof UserNotFoundError) {
-          throw new RpcException({
-            code: status.NOT_FOUND,
-            message: error.message,
-          });
-        }
-        throw new RpcException({
-          code: status.INTERNAL,
-          message: error.message,
-        });
+        throw DomainToGrpcErrorMapper.map(error);
       },
     });
   }
@@ -63,15 +53,7 @@ export class GrpcUserController {
     return match(result, {
       Ok: (id: string) => new IdResponseDto(new BaseUniqueEntityId(id)),
       Err: (error: Error) => {
-        if (error instanceof UserAlreadyExistsError)
-          throw new RpcException({
-            code: status.ALREADY_EXISTS,
-            message: error.message,
-          });
-        throw new RpcException({
-          code: status.INTERNAL,
-          message: error.message,
-        });
+        throw DomainToGrpcErrorMapper.map(error);
       },
     });
   }
