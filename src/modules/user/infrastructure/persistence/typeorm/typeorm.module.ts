@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeormConfig } from './typeorm.config';
-import { UserEntityOrm } from './entities/user.entity-orm';
+import { TypeOrmOptionModule } from './typeorm.option.module';
+import { TypeOrmOptionService } from './typeorm.option.service';
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      ...TypeormConfig,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [TypeOrmOptionModule],
+      inject: [TypeOrmOptionService],
+      useFactory: (typeormOptionService: TypeOrmOptionService) =>
+        typeormOptionService.createOptions(),
     }),
-    TypeOrmModule.forFeature([UserEntityOrm]),
   ],
 })
-export class TypeormModule {}
+export class TypeOrmDatabaseModule {}

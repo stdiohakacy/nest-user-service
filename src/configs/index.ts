@@ -1,4 +1,4 @@
 import AppConfig from 'src/configs/app.config';
-import MiddlewareConfig from 'src/configs/middleware.config';
+import PostgresConfig from 'src/configs/postgres.config';
 
-export default [AppConfig, MiddlewareConfig];
+export default [AppConfig, PostgresConfig];
