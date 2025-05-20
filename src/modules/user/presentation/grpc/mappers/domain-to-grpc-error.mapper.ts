@@ -5,23 +5,36 @@ import {
   UserAlreadyExistsError,
 } from '@module/user/domain/errors/user.errors';
 
+type GrpcExceptionHandler = (error: Error) => RpcException;
+
 export class DomainToGrpcErrorMapper {
+  private static readonly errorMap = new Map<Function, GrpcExceptionHandler>([
+    [
+      UserNotFoundError,
+      (error) =>
+        new RpcException({
+          code: status.NOT_FOUND,
+          message: error.message,
+        }),
+    ],
+    [
+      UserAlreadyExistsError,
+      (error) =>
+        new RpcException({
+          code: status.ALREADY_EXISTS,
+          message: error.message,
+        }),
+    ],
+  ]);
+
   static map(error: Error): RpcException {
-    if (error instanceof UserNotFoundError) {
-      return new RpcException({
-        code: status.NOT_FOUND,
-        message: error.message,
-      });
+    for (const [ErrorClass, handler] of this.errorMap.entries()) {
+      if (error instanceof ErrorClass) {
+        return handler(error);
+      }
     }
 
-    if (error instanceof UserAlreadyExistsError) {
-      return new RpcException({
-        code: status.ALREADY_EXISTS,
-        message: error.message,
-      });
-    }
-
-    // Default fallback
+    // fallback
     return new RpcException({
       code: status.INTERNAL,
       message: error.message || 'Internal server error',

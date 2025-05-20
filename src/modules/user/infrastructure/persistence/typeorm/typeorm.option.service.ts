@@ -26,8 +26,10 @@ export class TypeOrmOptionService implements TypeOrmOptionInterface {
       entities: [join(__dirname, 'entities', '*.entity-orm.{ts,js}')],
       ssl: isProd ? { rejectUnauthorized: false } : false,
       extra: {
-        max: 10, // Pool size
-        connectionTimeoutMillis: 3000,
+        max: 20,
+        min: 5,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
       },
       retryAttempts: 3,
       retryDelay: 1000,

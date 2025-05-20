@@ -15,13 +15,6 @@ export const TypeormConfig: DataSourceOptions = {
   synchronize: false,
   migrationsRun: true,
   logging: true,
-
-  extra: {
-    max: 20,
-    min: 5,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-  },
 };
 
 export default new DataSource({ ...TypeormConfig, synchronize: false });
