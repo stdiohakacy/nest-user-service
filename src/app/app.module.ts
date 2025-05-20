@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
-import { FeatureModule } from '../modules/feature.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { FeatureModule } from '../modules/feature.module';
 import configs from '../configs';
 import { RequestModule } from './request/request.module';
+import { AppMiddlewareModule } from './app.middleware.module';
 
 @Module({
   imports: [
@@ -14,8 +15,9 @@ import { RequestModule } from './request/request.module';
       envFilePath: ['.env'],
       expandVariables: false,
     }),
+    AppMiddlewareModule,
     CqrsModule.forRoot(),
-    RequestModule,
+    RequestModule.forRoot(),
     FeatureModule,
   ],
   providers: [],
