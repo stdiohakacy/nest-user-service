@@ -10,19 +10,18 @@ import {
 } from '@module/user/domain/errors/user.errors';
 import { FindUserByEmailGrpcRequestDto } from '../dtos/request/find-user-by-email.grpc-request.dto';
 import { UserResponseDto } from '@base/presentation/grpc/response/user.response.dto';
-import { UserMapper } from '@module/user/infrastructure/persistence/typeorm/mappers/user.mapper';
 import { CreateUserGrpcRequestDto } from '../dtos/request/create-user.grpc-request.dto';
 import { IdResponseDto } from '@base/presentation/grpc/response/id.response.dto';
 import { CreateUserCommand } from '@module/user/application/commands/create-user/create-user.command';
 import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
 import { DomainToGrpcErrorMapper } from '../mappers/domain-to-grpc-error.mapper';
+import { UserPresentationMapper } from '../mappers/user.presentation.mapper';
 
 @Controller()
 export class GrpcUserController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
-    private readonly userMapper: UserMapper,
   ) {}
 
   @GrpcMethod('UserService', 'FindUserByEmail')
@@ -35,7 +34,7 @@ export class GrpcUserController {
     // if Ok we return a response with an id
     // if Error decide what to do with it depending on its type
     return match(result, {
-      Ok: (user: UserEntity) => this.userMapper.toResponse(user),
+      Ok: (user: UserEntity) => UserPresentationMapper.toResponse(user),
       Err: (error: Error) => {
         throw DomainToGrpcErrorMapper.map(error);
       },

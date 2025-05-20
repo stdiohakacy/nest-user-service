@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
 import { UserEntityOrm } from '../entities/user.entity-orm';
 import { BaseUniqueEntityId } from '@base/domain/identifier/base.unique-entity.id';
-import { UserResponseDto } from '@base/presentation/grpc/response/user.response.dto';
 
 /**
  * Mapper constructs objects that are used in different layers:
@@ -12,8 +11,8 @@ import { UserResponseDto } from '@base/presentation/grpc/response/user.response.
  * and a ResponseDTO is an object returned to a user (usually as json).
  */
 @Injectable()
-export class UserMapper
-  implements MapperInterface<UserEntity, UserEntityOrm, UserResponseDto>
+export class UserInfraMapper
+  implements MapperInterface<UserEntity, UserEntityOrm>
 {
   toPersistence(entity: UserEntity): UserEntityOrm {
     const props = entity.getProps();
@@ -45,16 +44,6 @@ export class UserMapper
     });
 
     return entity;
-  }
-
-  toResponse(entity: UserEntity): UserResponseDto {
-    const props = entity.getProps();
-
-    const response = new UserResponseDto(entity);
-    response.email = props.email;
-    response.name = props.name;
-
-    return response;
   }
 
   /* ^ Data returned to the user is whitelisted to avoid leaks.
