@@ -9,8 +9,8 @@ import compression from 'compression';
 import { useContainer, validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { AppEnvDto } from './app/dtos/app.env.dto';
-import { GrpcRequestIdInterceptor } from './app/request/interceptors/grpc.request.id.interceptor';
-import { GrpcResponseTimeInterceptor } from './app/request/interceptors/grpc.response-time.interceptor';
+import { GrpcRequestIdInterceptor } from './common/request/interceptors/grpc.request.id.interceptor';
+import { GrpcResponseTimeInterceptor } from './common/request/interceptors/grpc.response-time.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -82,13 +82,13 @@ async function bootstrap() {
     },
   );
 
-  grpcApp.useGlobalInterceptors(
-    new GrpcRequestIdInterceptor(),
-    new GrpcResponseTimeInterceptor(),
-  );
+  // Inject từ DI container
+  const requestIdInterceptor = grpcApp.get(GrpcRequestIdInterceptor);
+  const responseTimeInterceptor = grpcApp.get(GrpcResponseTimeInterceptor);
+  grpcApp.useGlobalInterceptors(requestIdInterceptor, responseTimeInterceptor);
 
   grpcApp.listen();
-  console.log('gRPC Server started on port 6000');
+  console.log(`gRPC Server started on ${grpcHost}:${grpcPort}`);
 
   return;
 }

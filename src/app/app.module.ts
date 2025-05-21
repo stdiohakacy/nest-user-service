@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { FeatureModule } from '../modules/feature.module';
 import configs from '../configs';
-import { RequestModule } from './request/request.module';
+import { RequestModule } from '../common/request/request.module';
 import { AppMiddlewareModule } from './app.middleware.module';
 
 @Module({
