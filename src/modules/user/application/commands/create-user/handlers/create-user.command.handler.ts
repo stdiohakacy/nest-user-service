@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Err, Ok, Option, Result } from 'oxide.ts';
 import { UserRepositoryPort } from '../../../ports/user.repository.port';
 import { Inject } from '@nestjs/common';
-import { USER_REPOSITORY } from '@module/user/di/user.di.token';
+import { USER_REPOSITORY_PORT } from 'src/di/di.token';
 import { UserAlreadyExistsError } from '@module/user/domain/errors/user.errors';
 import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
 
@@ -13,7 +13,7 @@ export class CreateUserCommandHandler
     ICommandHandler<CreateUserCommand, Result<string, UserAlreadyExistsError>>
 {
   constructor(
-    @Inject(USER_REPOSITORY)
+    @Inject(USER_REPOSITORY_PORT)
     private readonly userRepository: UserRepositoryPort,
   ) {}
 
