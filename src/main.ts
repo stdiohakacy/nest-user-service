@@ -82,12 +82,12 @@ async function bootstrap() {
     },
   );
 
-  // Inject từ DI container
   const requestIdInterceptor = grpcApp.get(GrpcRequestIdInterceptor);
   const responseTimeInterceptor = grpcApp.get(GrpcResponseTimeInterceptor);
   grpcApp.useGlobalInterceptors(requestIdInterceptor, responseTimeInterceptor);
 
   grpcApp.listen();
+
   console.log(`gRPC Server started on ${grpcHost}:${grpcPort}`);
 
   return;

@@ -5,7 +5,7 @@ import { UserRepositoryPort } from '../../../ports/user.repository.port';
 import { UserEntity } from '@module/user/domain/aggregates/user.aggregate';
 import { UserNotFoundError } from '@module/user/domain/errors/user.errors';
 import { Inject } from '@nestjs/common';
-import { LOGGER_PORT, USER_REPOSITORY_PORT } from 'src/di/di.token';
+import { USER_REPOSITORY_PORT } from 'src/di/di.token';
 
 @QueryHandler(FindUserByEmailQuery)
 export class FindUserByEmailQueryHandler
