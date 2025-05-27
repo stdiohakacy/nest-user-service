@@ -1,8 +1,9 @@
 import { ExceptionBase } from '@base/exceptions';
+import { ERROR_CODES } from '@base/exceptions/error.codes';
 
 export class UserAlreadyExistsError extends ExceptionBase {
   static readonly message: string = 'User already exists';
-  public readonly code: string = 'USER.ALREADY_EXISTS';
+  readonly code = ERROR_CODES.USER.ALREADY_EXISTS;
 
   constructor(cause?: Error, metadata?: unknown) {
     super(UserAlreadyExistsError.message, cause, metadata);
@@ -11,7 +12,7 @@ export class UserAlreadyExistsError extends ExceptionBase {
 
 export class UserNotFoundError extends ExceptionBase {
   static readonly message: string = 'User not found';
-  public readonly code: string = 'USER.NOT_FOUND';
+  public readonly code: string = ERROR_CODES.USER.NOT_FOUND;
 
   constructor(cause?: Error, metadata?: unknown) {
     super(UserNotFoundError.message, cause, metadata);
