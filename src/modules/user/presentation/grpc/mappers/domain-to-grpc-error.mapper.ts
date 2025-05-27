@@ -23,12 +23,13 @@ export class DomainToGrpcErrorMapper {
   private static readonly errorMap = new Map<Function, GrpcExceptionHandler>([
     [
       UserNotFoundError,
-      (error) =>
-        new RpcException({
+      (error) => {
+        return new RpcException({
           code: status.NOT_FOUND,
           message: error.message,
           metadata: buildGrpcMetadata(error, ERROR_CODES.USER.NOT_FOUND),
-        }),
+        });
+      },
     ],
     [
       UserAlreadyExistsError,

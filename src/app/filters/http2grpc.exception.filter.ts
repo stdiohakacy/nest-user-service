@@ -1,4 +1,4 @@
-import { status, Metadata } from '@grpc/grpc-js';
+import { status } from '@grpc/grpc-js';
 import {
   Catch,
   ExceptionFilter,
@@ -6,9 +6,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
-import { RpcException } from '@nestjs/microservices';
-import { ExceptionBase } from '@base/exceptions';
-import { ERROR_CODES } from '@base/exceptions/error.codes';
 
 @Catch(HttpException)
 export class Http2gRPCExceptionFilter implements ExceptionFilter {
@@ -34,38 +31,20 @@ export class Http2gRPCExceptionFilter implements ExceptionFilter {
     [HttpStatus.PRECONDITION_FAILED]: status.FAILED_PRECONDITION,
   };
 
-  catch(exception: HttpException): Observable<never> {
+  catch(exception: HttpException): Observable<never> | void {
     const httpStatus = exception.getStatus();
-    const grpcStatus =
-      Http2gRPCExceptionFilter.HttpStatusCode[httpStatus] ?? status.UNKNOWN;
+    const httpRes = exception.getResponse() as {
+      details?: unknown;
+      message: unknown;
+    };
 
-    const response = exception.getResponse() as any;
-    const isDomainError = exception instanceof ExceptionBase;
-
-    const metadata = new Metadata();
-    metadata.set(
-      'errorCode',
-      isDomainError
-        ? exception.code
-        : ERROR_CODES.GENERIC.INTERNAL_SERVER_ERROR,
-    );
-    metadata.set(
-      'correlationId',
-      isDomainError
-        ? exception.correlationId
-        : Math.random().toString(36).substring(2, 15),
-    );
-    if (isDomainError && exception.metadata) {
-      metadata.set('metadata', JSON.stringify(exception.metadata));
-    }
-
-    const rpcException = new RpcException({
-      code: grpcStatus,
-      message:
-        response?.message || exception.message || 'Internal server error',
-      metadata,
-    });
-
-    return throwError(() => rpcException);
+    return throwError(() => ({
+      code:
+        Http2gRPCExceptionFilter.HttpStatusCode[httpStatus] ?? status.UNKNOWN,
+      message: httpRes.message || exception.message,
+      details: Array.isArray(httpRes.details)
+        ? httpRes.details
+        : httpRes.message,
+    }));
   }
 }
