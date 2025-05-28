@@ -13,7 +13,7 @@ export const TypeormConfig: DataSourceOptions = {
   migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
   migrationsTableName: 'migrations',
   synchronize: false,
-  migrationsRun: true,
+  migrationsRun: false,
   logging: true,
 };
 
