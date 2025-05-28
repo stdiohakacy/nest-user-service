@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ENUM_APP_ENVIRONMENT } from 'src/app/enums/app.enum';
-import { TypeOrmOptionInterface } from './interfaces/typeorm.option.interface';
 import { join } from 'path';
+import { TypeOrmOptionInterface } from './interfaces/typeorm.option.interface';
 
 @Injectable()
 export class TypeOrmOptionService implements TypeOrmOptionInterface {
@@ -21,7 +21,6 @@ export class TypeOrmOptionService implements TypeOrmOptionInterface {
       username: this.configService.get<string>('postgres.username'),
       password: this.configService.get<string>('postgres.password'),
       database: this.configService.get<string>('postgres.name'),
-      synchronize: !isProd,
       logging: !isProd,
       entities: [join(__dirname, 'entities', '*.entity-orm.{ts,js}')],
       ssl: isProd ? { rejectUnauthorized: false } : false,
